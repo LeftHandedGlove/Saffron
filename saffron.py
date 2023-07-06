@@ -27,6 +27,7 @@ class SaffronWindow(QMainWindow):
 
     def define_backend(self):
         self.finance_dir_parser = spending_report_parser.FinanceFolderParser()
+        self.current_report = None
 
     def define_actions(self):
         self.define_select_finance_report_folder_action()
@@ -48,16 +49,34 @@ class SaffronWindow(QMainWindow):
             caption="Select Finance Report Directory",
             directory=os.path.join(os.path.basename(__file__), 'spending_reports')
         )
-        report = self.finance_dir_parser.parse_folder(selected_directory)
-        
+        self.current_report = self.finance_dir_parser.parse_folder(selected_directory)
+        self.populate_entries_widgets()
 
+    def populate_entries_widgets(self):
+        report_entries = self.current_report.get_entires(
+            sorted_by=spending_report_parser.Sorters.TRANSACTION_DATE
+        )
+        for entry in report_entries:
+            pass
+            
     def define_visuals(self):
         self.setWindowTitle("Saffron: Financial Finger-Pointer")
         self.setGeometry(50, 50, 800, 500)
         self.add_menubar()
-        self.test_button = QPushButton("Choose Reports Folder", parent=self)
-        self.test_button.clicked.connect(self.select_finance_report_folder_action.trigger)
-        self.setCentralWidget(self.test_button)
+        self.define_select_report_visuals()
+        self.set_visuals_to_select_report_folder()
+        
+    def define_select_report_visuals(self):
+        self.select_reports_folder_button = QPushButton(
+            "Choose Reports Folder", 
+            parent=self
+        )
+        self.select_reports_folder_button.clicked.connect(
+            self.select_finance_report_folder_action.trigger
+        )
+
+    def set_visuals_to_select_report_folder(self):
+        self.setCentralWidget(self.select_reports_folder_button)
 
     def add_menubar(self):
         self.menu_bar = self.menuBar()
